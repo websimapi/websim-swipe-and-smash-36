@@ -219,8 +219,8 @@ class Game {
 
     onTimerEnd() {
         // This now triggers the orientation change
+        this.timer.reset();
         this.changeRequiredOrientation();
-        this.timer.reset(); // Restart the growth animation for the new next orientation
     }
 
     pauseTimer() {
