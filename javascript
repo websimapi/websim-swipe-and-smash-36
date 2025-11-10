@@ -1,29 +1,18 @@
-// ... existing code ...
-    resumeReplay() {
-        if (!this.replayState.isPaused) return;
+// game.js
+
+/* ...existing code... */
+    setNextRequiredOrientation() {
+        const possibleOrientations = ORIENTATIONS.filter(o => o !== this.requiredOrientation && o !== this.nextRequiredOrientation);
+        this.nextRequiredOrientation = possibleOrientations[Math.floor(Math.random() * possibleOrientations.length)];
         
-        this.replayState.isPaused = false;
-        this.replayState.startTime = performance.now() - this.replayState.pauseTime;
-
-        if (this.replayBgmControl && this.replayBgmControl.resume) {
-            this.replayBgmControl.resume();
-        }
-
-        const replayBoardElement = document.getElementById('replay-board');
-        // Find the replay board instance from the element if possible, or handle it differently.
-        // This part is tricky as we don't store the replayBoard instance on the game object.
-        // For simplicity and accuracy, let's restart the replay.
-        const recording = recorder.getRecording();
-        const replayBoard = new Board(config.boardSize, config.candyTypes, () => {}, () => {});
-        replayBoard.boardElement = replayBoardElement;
-        
-        this.scheduleReplayActions(replayBoard);
-
-        const playPauseButton = document.getElementById('play-pause-button');
-        playPauseButton.innerHTML = '&#10074;&#10074;'; // Pause icon
-        playPauseButton.classList.remove('playing');
+        // Defer style update to the next frame to prevent visual glitch
+        requestAnimationFrame(() => {
+            this.nextOrientationIndicator.style.backgroundColor = getOrientationColor(this.nextRequiredOrientation);
+            const nextPos = getIndicatorPosition(this.nextRequiredOrientation);
+            Object.assign(this.nextOrientationIndicator.style, nextPos);
+        });
     }
 
-    stopReplay() {
-// ... existing code ...
+    onTimerEnd() {
+/* ...existing code... */
 
