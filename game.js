@@ -71,6 +71,7 @@ class Game {
         this.comboCount = 0;
         this.smashValue = config.initialSmashValue;
         this.smashProgress = 0; // 0, 0.5
+        this.smashProgressResetTimeout = null;
         this.orientationIndicator = document.getElementById('orientation-indicator');
         this.orientationHandler = new OrientationHandler(this.orientationIndicator, this.onOrientationChange.bind(this));
         
@@ -285,7 +286,12 @@ class Game {
         
         if (isPlayerMove) {
             this.smashProgress += 0.5;
-            this.ui.updateSmash(this.smashValue, this.smashProgress);
+
+            // Clear any existing reset timer
+            if (this.smashProgressResetTimeout) {
+                clearTimeout(this.smashProgressResetTimeout);
+                this.smashProgressResetTimeout = null;
+            }
 
             if (this.smashProgress >= 1) {
                 this.ui.fillAndResetSmash(() => {
@@ -293,10 +299,17 @@ class Game {
                         this.smashValue++;
                     }
                     this.smashProgress = 0;
+                    this.ui.updateSmash(this.smashValue, this.smashProgress);
                 });
+            } else {
+                // If we're halfway, start a timer to reset progress
+                this.smashProgressResetTimeout = setTimeout(() => {
+                    this.smashProgress = 0;
+                    this.ui.updateSmash(this.smashValue, this.smashProgress);
+                    this.smashProgressResetTimeout = null;
+                }, 15000); // 15 seconds to make the next move
+                this.ui.updateSmash(this.smashValue, this.smashProgress);
             }
-            
-            this.timer.reset();
         }
 
         if (matchedCandies.length >= 5) {
