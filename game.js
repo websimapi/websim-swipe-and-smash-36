@@ -212,25 +212,16 @@ class Game {
         const possibleOrientations = ORIENTATIONS.filter(o => o !== this.requiredOrientation && o !== this.nextRequiredOrientation);
         this.nextRequiredOrientation = possibleOrientations[Math.floor(Math.random() * possibleOrientations.length)];
         
-        // Hide the indicator's color to prevent it flashing in the old position
-        this.nextOrientationIndicator.style.backgroundColor = 'transparent';
-        
-        // Defer the position update to the next frame to ensure the transparency is applied first
-        requestAnimationFrame(() => {
-            const nextPos = getIndicatorPosition(this.nextRequiredOrientation);
-            Object.assign(this.nextOrientationIndicator.style, nextPos);
-
-            // After 1.5 seconds, reveal the color. By this time, the position transition is complete.
-            setTimeout(() => {
-                this.nextOrientationIndicator.style.backgroundColor = getOrientationColor(this.nextRequiredOrientation);
-            }, 1500);
-        });
+        this.nextOrientationIndicator.style.backgroundColor = getOrientationColor(this.nextRequiredOrientation);
+        const nextPos = getIndicatorPosition(this.nextRequiredOrientation);
+        Object.assign(this.nextOrientationIndicator.style, nextPos);
     }
 
     onTimerEnd() {
         // This now triggers the orientation change
-        this.timer.reset();
+        this.timer.reset(); // Reset first to hide the indicator
         this.changeRequiredOrientation();
+        this.timer.start(); // Restart the growth animation for the new next orientation
     }
 
     pauseTimer() {

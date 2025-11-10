@@ -42,10 +42,10 @@ export default class GameTimer {
         }
         this.element.style.transition = 'transform 0s';
         this.element.style.transform = 'scale(0)';
-        // Force reflow
+        // Force reflow to apply the change immediately
         this.element.offsetHeight; 
         this.element.style.transition = '';
-        this.start();
+        // Do not call start() here anymore.
     }
 
     pause() {
